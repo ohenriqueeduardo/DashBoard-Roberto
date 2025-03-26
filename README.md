@@ -6,3 +6,7 @@ O que eu preciso ter de ideia central?
   - Atualização precisa ser minuto a minuto.
   - Preciso alocar o projeto a um link de acsso pra ele.
 
+Template: Dashbord, página única
+Linguagens: HTML, CSS e JS
+
+
