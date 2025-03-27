@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Daytrader</title>
+    <!-- Incluindo Chart.js para os gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Incluindo Moment.js para manipulação de tempo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <!-- Link para o arquivo CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header card">
+            <h1>DASHBOARD: DAYTRADE</h1>
+        </div>
+
+        <!-- Gráfico de variação -->
+        <div class="chart-container card">
+            <h2>VARIAÇÃO DAS BOLSAS</h2>
+            <canvas id="variationChart"></canvas>
+            <div class="last-update" id="lastUpdateChart"></div>
+        </div>
+
+        <!-- Tabela de alinhamento -->
+        <div class="card">
+            <h2>STATUS DAS BOLSAS</h2>
+            <table class="alignment-table">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Valor</th>
+                        <th>Interpretação</th>
+                    </tr>
+                </thead>
+                <tbody id="alignmentTableBody">
+                    <!-- Dados serão inseridos via JavaScript -->
+                </tbody>
+            </table>
+            <div class="last-update" id="lastUpdateAlignment"></div>
+        </div>
+
+        <!-- Containers das bolsas -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <h2>BOLSAS E VARIAÇÕES</h2>
+            <div class="exchange-container" id="exchangeContainer">
+                <!-- Dados serão inseridos via JavaScript -->
+            </div>
+            <div class="last-update" id="lastUpdateExchanges"></div>
+        </div>
+    </div>
+
+    <!-- Link para o arquivo JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
