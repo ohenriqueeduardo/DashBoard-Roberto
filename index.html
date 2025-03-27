@@ -3,56 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Daytrader</title>
-    <!-- Incluindo Chart.js para os gráficos -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Incluindo Moment.js para manipulação de tempo -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <!-- Link para o arquivo CSS -->
-    <link rel="stylesheet" href="style.css">
+    <title>Daytrader Dashboard - ProfitPro</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="dashboard">
-        <div class="header card">
-            <h1>DASHBOARD: DAYTRADE</h1>
-        </div>
+        <header class="header">
+            <h1>Daytrader Dashboard</h1>
+            <p>Monitoramento em tempo real das bolsas via ProfitPro API</p>
+        </header>
 
-        <!-- Gráfico de variação -->
-        <div class="chart-container card">
-            <h2>VARIAÇÃO DAS BOLSAS</h2>
-            <canvas id="variationChart"></canvas>
-            <div class="last-update" id="lastUpdateChart"></div>
+        <div class="exchanges" id="exchangesContainer">
+            <!-- As cartas das bolsas serão inseridas aqui via JavaScript -->
         </div>
-
-        <!-- Tabela de alinhamento -->
-        <div class="card">
-            <h2>STATUS DAS BOLSAS</h2>
-            <table class="alignment-table">
+        
+        <div class="chart-container">
+            <canvas id="priceChart"></canvas>
+        </div>
+        
+        <div class="summary">
+            <h2>Resumo do Dia</h2>
+            <div id="daySummary">
+                <p>Carregando dados...</p>
+            </div>
+            <table>
                 <thead>
                     <tr>
                         <th>Status</th>
                         <th>Valor</th>
-                        <th>Interpretação</th>
                     </tr>
                 </thead>
-                <tbody id="alignmentTableBody">
-                    <!-- Dados serão inseridos via JavaScript -->
+                <tbody id="alignmentTable">
+                    <tr>
+                        <td>Alinhamento Total</td>
+                        <td id="totalAlignment">-</td>
+                    </tr>
+                    <tr>
+                        <td>Classificação</td>
+                        <td id="alignmentStatus">-</td>
+                    </tr>
                 </tbody>
             </table>
-            <div class="last-update" id="lastUpdateAlignment"></div>
+            <div class="last-update" id="lastUpdate"></div>
         </div>
-
-        <!-- Containers das bolsas -->
-        <div class="card" style="grid-column: 1 / -1;">
-            <h2>BOLSAS E VARIAÇÕES</h2>
-            <div class="exchange-container" id="exchangeContainer">
-                <!-- Dados serão inseridos via JavaScript -->
+        
+        <div class="market-status">
+            <h2>Movimentação do Dia</h2>
+            <div id="marketMovement">
+                <p>Carregando dados...</p>
             </div>
-            <div class="last-update" id="lastUpdateExchanges"></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Métrica</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody id="movementTable">
+                    <tr>
+                        <td>Maior Pico</td>
+                        <td id="peakHigh">-</td>
+                    </tr>
+                    <tr>
+                        <td>Menor Pico</td>
+                        <td id="peakLow">-</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- Link para o arquivo JavaScript -->
+    <!-- Bibliotecas necessárias -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment"></script>
     <script src="script.js"></script>
 </body>
 </html>

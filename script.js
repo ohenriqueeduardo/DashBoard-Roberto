@@ -1,217 +1,324 @@
 // Configurações globais
-const API_URL = 'https://api.profitpro.com.br'; // URL base da API (substituir pela real)
-const API_KEY = 'SUA_CHAVE_DE_API_AQUI'; // Sua chave de API da ProfitPro
-const EXCHANGES = ['IBRA', 'IGCX', 'IGCT', 'ITAG', 'MLCX', 'IBXL', 'ICO2']; // Bolsas a serem monitoradas
+const API_ENDPOINT = 'https://api.profitpro.com.br/'; // Substitua pelo endpoint real
+const API_KEY = 'SUA_CHAVE_DE_API_AQUI'; // Substitua pela sua chave de API
+const EXCHANGES = ['IBRA', 'IGCX', 'IGCT', 'ITAG', 'MLCX', 'IBXL', 'ICO2'];
 const UPDATE_INTERVAL = 60000; // 1 minuto em milissegundos
 
-// Variáveis globais para armazenar dados
-let chartData = {
-    labels: [], // Armazena os horários das atualizações
-    datasets: [{
-        label: 'Variação Combinada',
-        data: [], // Armazena os valores da variação combinada
-        borderColor: '#4fc3f7',
-        backgroundColor: 'rgba(79, 195, 247, 0.1)',
-        borderWidth: 2,
-        fill: true
-    }]
-};
+// Variáveis para armazenamento de dados
+let priceHistory = [];
+let chart;
+let lastData = {};
+let dayPeakHigh = -Infinity;
+let dayPeakLow = Infinity;
+let dayStartTime = new Date();
+let dayMovementCount = 0;
 
-let exchangesData = {}; // Armazena os dados de cada bolsa
-let totalAlignment = 0; // Armazena o alinhamento total
-let chart; // Variável para armazenar a instância do gráfico
+// Inicializa o dashboard quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', function() {
+    initializeChart();
+    createExchangeCards();
+    fetchData();
+    
+    // Configura atualização automática
+    setInterval(fetchData, UPDATE_INTERVAL);
+});
 
-// Inicialização do gráfico
+// Inicializa o gráfico com Chart.js
 function initializeChart() {
-    const ctx = document.getElementById('variationChart').getContext('2d');
-    return new Chart(ctx, {
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    
+    chart = new Chart(ctx, {
         type: 'line',
-        data: chartData,
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Variação Total',
+                data: [],
+                borderColor: '#4bc0c0',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0
+            }]
+        },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: false
+                }
+            },
             scales: {
                 x: {
-                    title: {
-                        display: true,
-                        text: 'Tempo',
-                        color: '#e0e0e0'
-                    },
-                    ticks: {
-                        color: '#e0e0e0'
-                    },
+                    display: false,
                     grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
+                        display: false
                     }
                 },
                 y: {
-                    title: {
-                        display: true,
-                        text: 'Variação Combinada',
-                        color: '#e0e0e0'
+                    display: true,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
                     },
                     ticks: {
                         color: '#e0e0e0'
-                    },
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
                     }
                 }
             },
-            plugins: {
-                legend: {
-                    labels: {
-                        color: '#e0e0e0'
-                    }
-                }
+            interaction: {
+                intersect: false,
+                mode: 'index'
             }
         }
     });
 }
 
-// Função para buscar dados da API
-async function fetchData() {
-    try {
-        // Simulação de chamada à API (substituir pela chamada real)
-        // Na prática, você faria uma requisição para cada bolsa ou uma única que retorne todas
-        const mockData = {
-            IBRA: { value: Math.random() * 100 - 50, variation: Math.random() * 2 - 1 },
-            IGCX: { value: Math.random() * 100 - 50, variation: Math.random() * 2 - 1 },
-            IGCT: { value: Math.random() * 100 - 50, variation: Math.random() * 2 - 1 },
-            ITAG: { value: Math.random() * 100 - 50, variation: Math.random() * 2 - 1 },
-            MLCX: { value: Math.random() * 100 - 50, variation: Math.random() * 2 - 1 },
-            IBXL: { value: Math.random() * 100 - 50, variation: Math.random() * 2 - 1 },
-            ICO2: { value: Math.random() * 100 - 50, variation: Math.random() * 2 - 1 }
-        };
+// Cria os cards para cada bolsa
+function createExchangeCards() {
+    const container = document.getElementById('exchangesContainer');
+    
+    EXCHANGES.forEach(exchange => {
+        const card = document.createElement('div');
+        card.className = 'exchange-card';
+        card.id = `card-${exchange}`;
+        card.innerHTML = `
+            <div class="exchange-name">${exchange}</div>
+            <div class="exchange-value" id="value-${exchange}">-</div>
+            <div class="exchange-change" id="change-${exchange}">-</div>
+        `;
+        container.appendChild(card);
+    });
+}
 
-        // Atualiza os dados das bolsas
+// Busca dados da API
+function fetchData() {
+    // Simulação de dados - substitua por chamada real à API
+    // Na implementação real, você faria uma chamada fetch/axios para a API da ProfitPro
+    simulateApiCall().then(data => {
+        processData(data);
+        updateLastUpdateTime();
+    }).catch(error => {
+        console.error('Erro ao buscar dados:', error);
+    });
+}
+
+// Processa os dados recebidos da API
+function processData(data) {
+    lastData = data;
+    
+    // Atualiza os cards das bolsas
+    updateExchangeCards(data);
+    
+    // Calcula a variação total
+    const totalVariation = calculateTotalVariation(data);
+    
+    // Adiciona ao histórico de preços
+    addToPriceHistory(totalVariation);
+    
+    // Atualiza o gráfico
+    updateChart();
+    
+    // Calcula o alinhamento total
+    const alignment = calculateAlignment(data);
+    updateAlignmentStatus(alignment);
+    
+    // Atualiza o resumo do dia
+    updateDaySummary(totalVariation);
+}
+
+// Atualiza os cards das bolsas com os novos dados
+function updateExchangeCards(data) {
+    EXCHANGES.forEach(exchange => {
+        const valueElement = document.getElementById(`value-${exchange}`);
+        const changeElement = document.getElementById(`change-${exchange}`);
+        
+        if (data[exchange]) {
+            const value = data[exchange].value;
+            const change = data[exchange].change;
+            
+            valueElement.textContent = value.toFixed(2);
+            changeElement.textContent = change >= 0 ? `+${change.toFixed(2)}%` : `${change.toFixed(2)}%`;
+            
+            // Aplica classes de cor baseado na variação
+            changeElement.className = 'exchange-change';
+            if (change > 0) {
+                changeElement.classList.add('positive');
+            } else if (change < 0) {
+                changeElement.classList.add('negative');
+            } else {
+                changeElement.classList.add('neutral');
+            }
+        }
+    });
+}
+
+// Calcula a variação total somando todas as bolsas
+function calculateTotalVariation(data) {
+    return EXCHANGES.reduce((sum, exchange) => {
+        return sum + (data[exchange]?.change || 0);
+    }, 0);
+}
+
+// Adiciona nova entrada ao histórico de preços
+function addToPriceHistory(variation) {
+    const now = new Date();
+    const timeLabel = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    priceHistory.push({
+        time: timeLabel,
+        value: variation
+    });
+    
+    // Mantém apenas os últimos 60 pontos (1 hora de dados)
+    if (priceHistory.length > 60) {
+        priceHistory.shift();
+    }
+}
+
+// Atualiza o gráfico com os dados mais recentes
+function updateChart() {
+    chart.data.labels = priceHistory.map(item => item.time);
+    chart.data.datasets[0].data = priceHistory.map(item => item.value);
+    chart.update();
+}
+
+// Calcula o alinhamento total das bolsas
+function calculateAlignment(data) {
+    // Neste exemplo, estamos usando a soma das variações como alinhamento
+    // Você pode ajustar esta lógica conforme necessário
+    return calculateTotalVariation(data);
+}
+
+// Atualiza o status de alinhamento na tabela
+function updateAlignmentStatus(alignment) {
+    const alignmentElement = document.getElementById('totalAlignment');
+    const statusElement = document.getElementById('alignmentStatus');
+    
+    alignmentElement.textContent = alignment.toFixed(2);
+    
+    // Determina a classificação baseada nos valores fornecidos
+    if (alignment > 50) {
+        statusElement.textContent = 'MUITO FORTE';
+        statusElement.className = 'very-strong';
+    } else if (alignment > 30) {
+        statusElement.textContent = 'FORTE';
+        statusElement.className = 'strong';
+    } else if (alignment > -10) {
+        statusElement.textContent = 'INDECISÃO';
+        statusElement.className = 'indecision';
+    } else if (alignment > -50) {
+        statusElement.textContent = 'BAIXO';
+        statusElement.className = 'weak';
+    } else {
+        statusElement.textContent = 'MUITO BAIXO';
+        statusElement.className = 'very-weak';
+    }
+}
+
+// Atualiza o resumo do dia
+function updateDaySummary(currentVariation) {
+    // Atualiza os picos do dia
+    if (currentVariation > dayPeakHigh) {
+        dayPeakHigh = currentVariation;
+        document.getElementById('peakHigh').textContent = dayPeakHigh.toFixed(2);
+    }
+    
+    if (currentVariation < dayPeakLow) {
+        dayPeakLow = currentVariation;
+        document.getElementById('peakLow').textContent = dayPeakLow.toFixed(2);
+    }
+    
+    // Conta como mais uma movimentação
+    dayMovementCount++;
+    
+    // Determina o status do mercado
+    const movementElement = document.getElementById('marketMovement');
+    const diff = dayPeakHigh - dayPeakLow;
+    
+    if (diff > 50) {
+        movementElement.innerHTML = '<p class="positive">Dia <strong>MUITO MOVIMENTADO</strong></p>';
+    } else if (diff > 30) {
+        movementElement.innerHTML = '<p class="positive">Dia <strong>movimentado</strong></p>';
+    } else if (diff > -30) {
+        movementElement.innerHTML = '<p class="neutral">Dia <strong>normal</strong></p>';
+    } else {
+        movementElement.innerHTML = '<p class="negative">Dia <strong>pouco movimentado</strong></p>';
+    }
+    
+    // Atualiza o resumo do dia
+    const now = new Date();
+    
+    document.getElementById('daySummary').innerHTML = `
+        <p>Movimentações registradas: ${dayMovementCount}</p>
+        <p>Amplitude do dia: ${diff.toFixed(2)}</p>
+    `;
+}
+
+// Atualiza o horário da última atualização
+function updateLastUpdateTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString();
+    document.getElementById('lastUpdate').textContent = `Última atualização: ${timeString}`;
+}
+
+// Função de simulação da API - substitua pela chamada real
+function simulateApiCall() {
+    return new Promise((resolve) => {
+        const data = {};
+        
         EXCHANGES.forEach(exchange => {
-            exchangesData[exchange] = {
-                value: mockData[exchange].value,
-                variation: mockData[exchange].variation,
-                lastUpdated: new Date()
+            // Gera valores aleatórios para simulação
+            const lastValue = lastData[exchange]?.value || 1000 + Math.random() * 500;
+            const change = (Math.random()) * 4; // Variação entre -2% e +2%
+            const newValue = lastValue * (1 + change / 100);
+            
+            data[exchange] = {
+                value: newValue,
+                change: change
             };
         });
+        
+        // Simula um delay de rede
+        setTimeout(() => resolve(data), 500);
+    });
+}
 
-        // Calcula o alinhamento total (soma dos valores)
-        totalAlignment = EXCHANGES.reduce((sum, exchange) => sum + mockData[exchange].value, 0);
-
-        return true;
+// Implementação real com API da ProfitPro (exemplo)
+/*
+async function fetchRealData() {
+    try {
+        const response = await fetch(`${API_ENDPOINT}/market-data`, {
+            headers: {
+                'Authorization': `Bearer ${API_KEY}`
+            }
+        });
+        
+        if (!response.ok) throw new Error('Erro na API');
+        
+        const data = await response.json();
+        return processApiData(data); // Você precisará adaptar os dados da API para o formato esperado
     } catch (error) {
         console.error('Erro ao buscar dados:', error);
-        return false;
+        return null;
     }
 }
 
-// Atualiza o gráfico com novos dados
-function updateChart(timestamp) {
-    // Adiciona novo ponto de dados
-    chartData.labels.push(moment(timestamp).format('HH:mm:ss'));
-    chartData.datasets[0].data.push(totalAlignment);
-
-    // Mantém apenas os últimos 30 pontos para não sobrecarregar o gráfico
-    if (chartData.labels.length > 30) {
-        chartData.labels.shift();
-        chartData.datasets[0].data.shift();
-    }
-
-    // Atualiza o gráfico
-    chart.update();
-
-    // Atualiza o horário da última atualização
-    document.getElementById('lastUpdateChart').textContent = `Última atualização: ${moment(timestamp).format('HH:mm:ss')}`;
-}
-
-// Atualiza a tabela de alinhamento
-function updateAlignmentTable(timestamp) {
-    const tableBody = document.getElementById('alignmentTableBody');
+function processApiData(apiData) {
+    // Converte os dados da API para o formato que seu dashboard espera
+    const processedData = {};
     
-    // Determina o status com base no valor total
-    let status, interpretation, statusClass;
-    
-    if (totalAlignment > 200) {
-        status = 'MUITO FORTE';
-        interpretation = 'Tendência de alta muito forte';
-        statusClass = 'very-strong';
-    } else if (totalAlignment > 180) {
-        status = 'FORTE';
-        interpretation = 'Tendência de alta forte';
-        statusClass = 'strong';
-    } else if (totalAlignment > -150) {
-        status = 'INDECISÃO';
-        interpretation = 'Mercado em indecisão';
-        statusClass = 'indecision';
-    } else if (totalAlignment > -200) {
-        status = 'BAIXO';
-        interpretation = 'Tendência de baixa';
-        statusClass = 'low';
-    } else {
-        status = 'MUITO BAIXO';
-        interpretation = 'Tendência de baixa muito forte';
-        statusClass = 'very-low';
-    }
-
-    // Atualiza a tabela
-    tableBody.innerHTML = `
-        <tr>
-            <td class="${statusClass}">${status}</td>
-            <td>${totalAlignment.toFixed(2)}</td>
-            <td>${interpretation}</td>
-        </tr>
-    `;
-
-    // Atualiza o horário da última atualização
-    document.getElementById('lastUpdateAlignment').textContent = `Última atualização: ${moment(timestamp).format('HH:mm:ss')}`;
-}
-
-// Atualiza os cards das bolsas
-function updateExchangeCards(timestamp) {
-    const container = document.getElementById('exchangeContainer');
-    container.innerHTML = '';
-
-    // Cria um card para cada bolsa
     EXCHANGES.forEach(exchange => {
-        const data = exchangesData[exchange];
-        const variationClass = data.variation >= 0 ? 'positive' : 'negative';
-        const variationSymbol = data.variation >= 0 ? '+' : '';
-
-        container.innerHTML += `
-            <div class="exchange-card">
-                <div class="exchange-name">${exchange}</div>
-                <div class="exchange-value ${variationClass}">
-                    ${variationSymbol}${data.variation.toFixed(2)}%
-                </div>
-                <div>Valor: ${data.value.toFixed(2)}</div>
-            </div>
-        `;
+        processedData[exchange] = {
+            value: apiData[exchange].currentValue,
+            change: apiData[exchange].percentageChange
+        };
     });
-
-    // Atualiza o horário da última atualização
-    document.getElementById('lastUpdateExchanges').textContent = `Última atualização: ${moment(timestamp).format('HH:mm:ss')}`;
+    
+    return processedData;
 }
-
-// Função principal que executa todo o processo de atualização
-async function updateDashboard() {
-    const timestamp = new Date();
-    const success = await fetchData();
-    
-    if (success) {
-        updateChart(timestamp);
-        updateAlignmentTable(timestamp);
-        updateExchangeCards(timestamp);
-    }
-}
-
-// Inicialização do dashboard quando o DOM estiver carregado
-document.addEventListener('DOMContentLoaded', async () => {
-    // Inicializa o gráfico
-    chart = initializeChart();
-    
-    // Primeira atualização
-    await updateDashboard();
-    
-    // Configura atualização periódica
-    setInterval(async () => {
-        await updateDashboard();
-    }, UPDATE_INTERVAL);
-});
+*/
