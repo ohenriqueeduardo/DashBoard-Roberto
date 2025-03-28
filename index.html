@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daytrader Dashboard - ProfitPro</title>
+    <title>Daytrader Dashboard - Finnhub</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@2.0.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.0.0"></script>
 </head>
 <body>
     <div class="dashboard">
         <header class="header">
             <h1>Daytrader Dashboard</h1>
-            <p>Monitoramento em tempo real das bolsas via ProfitPro API</p>
+            <p>Monitoramento em tempo real via Finnhub API</p>
         </header>
 
         <div class="exchanges" id="exchangesContainer">
@@ -65,7 +68,7 @@
                         <td id="peakHigh">-</td>
                     </tr>
                     <tr>
-                        <td>Menor Pico</td>
+                        <td>Menor Vale</td>
                         <td id="peakLow">-</td>
                     </tr>
                 </tbody>
@@ -73,9 +76,6 @@
         </div>
     </div>
 
-    <!-- Bibliotecas necessárias -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment"></script>
     <script src="script.js"></script>
 </body>
 </html>
