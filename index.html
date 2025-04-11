@@ -3,79 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daytrader Dashboard - Finnhub</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Dashboard Financeiro em Tempo Real</title>
+    <link rel="stylesheet" href="./src/reset.css">
+    <link rel="stylesheet" href="./src/style.css">
+    <link rel="stylesheet" href="./src/responsive.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon@2.0.2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.0.0"></script>
+    <script src="./src/script.js" defer></script>
 </head>
 <body>
+    <!-- O conteúdo permanece exatamente o mesmo do seu último index.html -->
     <div class="dashboard">
-        <header class="header">
-            <h1>Daytrader Dashboard</h1>
-            <p>Monitoramento em tempo real via Finnhub API</p>
+        <header>
+            <h1>DASHBOARD FINANCEIRO</h1>
+            <div class="time-info">
+                <span id="current-time">00:00:00</span>
+                <span id="current-date">00/00/0000</span>
+            </div>
         </header>
-
-        <div class="exchanges" id="exchangesContainer">
-            <!-- As cartas das bolsas serão inseridas aqui via JavaScript -->
-        </div>
         
-        <div class="chart-container">
-            <canvas id="priceChart"></canvas>
-        </div>
-        
-        <div class="summary">
-            <h2>Resumo do Dia</h2>
-            <div id="daySummary">
-                <p>Carregando dados...</p>
+        <div class="grafico-section">
+            <div class="section-header">
+                <h2 class="grafico-title">Variação em Tempo Real</h2>
+                <div class="refresh-controls">
+                    <button id="refresh-btn">Atualizar</button>
+                    <span id="last-update">Última atualização: --:--:--</span>
+                </div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Status</th>
-                        <th>Valor</th>
-                    </tr>
-                </thead>
-                <tbody id="alignmentTable">
-                    <tr>
-                        <td>Alinhamento Total</td>
-                        <td id="totalAlignment">-</td>
-                    </tr>
-                    <tr>
-                        <td>Classificação</td>
-                        <td id="alignmentStatus">-</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="last-update" id="lastUpdate"></div>
+            <canvas id="grafico-tempo-real"></canvas>
         </div>
         
-        <div class="market-status">
-            <h2>Movimentação do Dia</h2>
-            <div id="marketMovement">
-                <p>Carregando dados...</p>
+        <div class="data-section">
+            <div class="movimentacoes-section">
+                <h2 class="section-title">Movimentações</h2>
+                <div class="search-filter">
+                    <input type="text" id="search-input" placeholder="Pesquisar ativo...">
+                    <select id="filter-select">
+                        <option value="all">Todos</option>
+                        <option value="positive">Positivos</option>
+                        <option value="negative">Negativos</option>
+                    </select>
+                </div>
+                <ul class="movimentacoes-list" id="movimentacoes-list">
+                    <!-- Dados serão carregados via JavaScript -->
+                </ul>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Métrica</th>
-                        <th>Valor</th>
-                    </tr>
-                </thead>
-                <tbody id="movementTable">
-                    <tr>
-                        <td>Maior Pico</td>
-                        <td id="peakHigh">-</td>
-                    </tr>
-                    <tr>
-                        <td>Menor Vale</td>
-                        <td id="peakLow">-</td>
-                    </tr>
-                </tbody>
-            </table>
+            
+            <div class="destaques-section">
+                <h2 class="section-title">Destaques</h2>
+                <div class="highlight-cards">
+                    <div class="highlight-card" id="maior-alta">
+                        <h3>Maior Alta</h3>
+                        <p class="highlight-value positive">--</p>
+                        <p class="highlight-name">--</p>
+                    </div>
+                    <div class="highlight-card" id="maior-baixa">
+                        <h3>Maior Baixa</h3>
+                        <p class="highlight-value negative">--</p>
+                        <p class="highlight-name">--</p>
+                    </div>
+                    <div class="highlight-card" id="volume-total">
+                        <h3>Volume Total</h3>
+                        <p class="highlight-value">--</p>
+                    </div>
+                </div>
+            </div>
         </div>
+        
+        <div class="resumo-section">
+            <div class="resumo-box">
+                <h2 class="resumo-title">Previsões do Dia</h2>
+                <div id="previsoes-content">
+                    <!-- Dados serão carregados via JavaScript -->
+                </div>
+            </div>
+            <div class="resumo-box">
+                <h2 class="resumo-title">Notícias Recentes</h2>
+                <div id="noticias-content">
+                    <!-- Dados serão carregados via JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Dados atualizados em tempo real | <span id="api-status">Conectando à API...</span></p>
+        </footer>
     </div>
-
-    <script src="script.js"></script>
 </body>
 </html>

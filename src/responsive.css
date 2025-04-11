@@ -1,0 +1,172 @@
+/* 
+ * Responsividade para o Dashboard Financeiro
+ * Breakpoints seguindo padrões comuns:
+ * - Mobile: até 767px
+ * - Tablet: 768px a 1023px
+ * - Desktop: 1024px em diante
+ */
+
+/* Dispositivos móveis (portrait e landscape) */
+@media only screen and (max-width: 767px) {
+    body {
+        padding: 10px;
+    }
+    
+    .dashboard {
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .time-info {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .refresh-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    #grafico-tempo-real {
+        height: 250px;
+        padding: 10px;
+    }
+    
+    .data-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .search-filter {
+        flex-direction: column;
+    }
+    
+    .movimentacoes-list {
+        max-height: 300px;
+    }
+    
+    .highlight-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .resumo-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .resumo-box {
+        padding: 15px;
+    }
+}
+
+/* Tablets (portrait e landscape) */
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+    .dashboard {
+        padding: 20px;
+    }
+    
+    .data-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .highlight-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .highlight-card:last-child {
+        grid-column: span 2;
+        max-width: 50%;
+        justify-self: center;
+    }
+    
+    #grafico-tempo-real {
+        height: 280px;
+    }
+}
+
+/* Desktop pequenos (1024px a 1279px) */
+@media only screen and (min-width: 1024px) and (max-width: 1279px) {
+    .dashboard {
+        max-width: 1000px;
+    }
+    
+    .highlight-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Desktop grandes (1280px em diante) */
+@media only screen and (min-width: 1280px) {
+    /* Mantém os estilos base para telas grandes */
+}
+
+/* Ajustes para orientação landscape em dispositivos móveis */
+@media only screen and (max-width: 767px) and (orientation: landscape) {
+    #grafico-tempo-real {
+        height: 200px;
+    }
+    
+    .movimentacoes-list {
+        max-height: 150px;
+    }
+}
+
+/* Ajustes para telas muito pequenas (até 360px) */
+@media only screen and (max-width: 360px) {
+    h1 {
+        font-size: 20px;
+    }
+    
+    .section-title, .resumo-title {
+        font-size: 16px;
+    }
+    
+    .highlight-card {
+        padding: 15px 10px;
+    }
+    
+    .highlight-value {
+        font-size: 20px;
+    }
+}
+
+/* Impressão */
+@media print {
+    body {
+        background-color: white;
+        padding: 0;
+        font-size: 12pt;
+    }
+    
+    .dashboard {
+        box-shadow: none;
+        padding: 10px;
+        max-width: 100%;
+    }
+    
+    #refresh-btn, .search-filter {
+        display: none;
+    }
+    
+    .data-section, .resumo-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .highlight-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    footer {
+        display: none;
+    }
+}
